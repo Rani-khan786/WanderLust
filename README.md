@@ -2,7 +2,6 @@
 
 > *Discover Stays & Homes Across the World*
 
-![Wander Lust Banner](./assets/banner.png)
 
 Wander Lust is a full‑fledged hotel and rental property hosting platform inspired by Airbnb.  
 It allows users to explore, list, and manage stays with an intuitive interface and smooth user experience.
