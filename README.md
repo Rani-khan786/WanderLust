@@ -101,7 +101,7 @@ Feel free to fork this repo and submit a pull request.
 For feedback or collaboration, reach out:
 
 **Your Name** – _Developer of Wander Lust_  
-📍 GitHub: https://github.com/your-Rani-khan786 
+📍 GitHub: https://github.com/Rani-khan786 
 
 ---
 
