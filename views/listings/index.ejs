@@ -1,4 +1,5 @@
 <% layout("layouts/boilerplate") %>
+
 <style>
 /* MAIN BAR */
 .filters-bar {
@@ -13,7 +14,7 @@
   display: flex;
   gap: 2rem;
   overflow-x: auto;
-  flex: 1;                 /* 👈 KEY LINE */
+  flex: 1;
   scrollbar-width: none;
 }
 
@@ -44,21 +45,24 @@
   border-radius: 3rem;
   padding: 0.6rem 1.2rem;
   white-space: nowrap;
-  flex-shrink: 0;          /* 👈 PREVENTS WRAP */
+  flex-shrink: 0;
 }
 
 /* MOBILE */
 @media (max-width: 768px) {
   .tax-toggle {
-    display: none; /* Airbnb hides it on mobile */
+    display: none;
   }
 }
+
 .filters.active {
   opacity: 1;
   border-bottom: 2px solid black;
 }
 </style>
- <div class="filters-bar">
+
+<div class="filters-bar">
+
   <!-- ICONS -->
   <div id="filters">
     <% const categoryIcons = {
@@ -78,7 +82,7 @@
     <% for (let cat in categoryIcons) { %>
       <a
         href="/listings?category=<%= cat %>"
-        class="filters"
+        class="filters <%= activeCategory === cat ? "active" : "" %>"
         style="text-decoration:none;color:inherit;"
       >
         <i class="fa-solid <%= categoryIcons[cat] %>"></i>
@@ -96,48 +100,59 @@
       </label>
     </div>
   </div>
+
 </div>
- </div>
-  <div class="row g-4">
-    <% for (let listing of allListings) { %>
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mt-3">
-        <div class="card listing-card h-100">
-       <img 
-  src="<%= listing.image?.url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80' %>" 
-  class="card-img-top" 
-  alt="listing image"
-/>
 
+<div class="row g-4">
 
-
-          <div class="card-body d-flex flex-column">
-            <h6 class="card-title"><%= listing.title %></h6>
-            <p class="card-text text-muted mb-3">
-              ₹<%= listing.price.toLocaleString("en-IN") %> / night
-              <i class="tax-info"">&nbsp; &nbsp; +18% GST</i>
-            </p>
-            
-
-            <a href="/listings/<%= listing._id %>" class="btn btn-primary mt-auto w-100">
-              View
-            </a>
-          </div>
-        </div>
+  <% if(allListings.length === 0) { %>
+    <div class="col-12">
+      <div class="alert alert-warning text-center">
+        No listings available right now.
       </div>
-    <% } %>
-  </div>
+    </div>
+  <% } %>
+
+  <% for (let listing of allListings) { %>
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mt-3">
+      <div class="card listing-card h-100">
+
+        <img 
+          src="<%= listing.image?.url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80' %>" 
+          class="card-img-top" 
+          alt="listing image"
+        />
+
+        <div class="card-body d-flex flex-column">
+          <h6 class="card-title"><%= listing.title %></h6>
+
+          <p class="card-text text-muted mb-3">
+            ₹<%= listing.price.toLocaleString("en-IN") %> / night
+            <i class="tax-info">&nbsp; &nbsp; +18% GST</i>
+          </p>
+
+          <a href="/listings/<%= listing._id %>" class="btn btn-primary mt-auto w-100">
+            View
+          </a>
+        </div>
+
+      </div>
+    </div>
+  <% } %>
+
 </div>
 
 <script>
- let taxSwitch = document.getElementById("switchCheckReverse");
- taxSwitch.addEventListener("click", ()=>{
-  let taxInfo = document.getElementsByClassName("tax-info");
-  for(info of taxInfo){
-    if(info.style.display !="inline"){
-      info.style.display = "inline";
-  } else{
-      info.style.display = "none";
-  }
-}
- });
+  let taxSwitch = document.getElementById("switchCheckReverse");
+
+  taxSwitch.addEventListener("click", () => {
+    let taxInfo = document.getElementsByClassName("tax-info");
+    for (let info of taxInfo) {
+      if (info.style.display !== "inline") {
+        info.style.display = "inline";
+      } else {
+        info.style.display = "none";
+      }
+    }
+  });
 </script>

@@ -2,28 +2,38 @@ const Listing = require("../models/listing");
 const categories = require("../utils/categories");
 
 /* INDEX */
+/* INDEX */
 module.exports.index = async (req, res) => {
   const { category, search } = req.query;
 
   let filter = {};
-  if (category) filter.category = category;
 
+  // category filter
+  if (category && category.trim() !== "") {
+    filter.category = category;
+  }
+
+  // search filter
   if (search && search.trim() !== "") {
     filter.title = { $regex: search.trim(), $options: "i" };
   }
 
   const allListings = await Listing.find(filter);
 
+  // ✅ If user searched/filtered and no results found → redirect + flash
   if (allListings.length === 0 && (search || category)) {
     req.flash("error", "No listings found!");
+    return res.redirect("/listings");
   }
 
+  // ✅ Normal render
   return res.render("listings/index.ejs", {
     allListings,
     activeCategory: category || "",
     search: search || "",
   });
 };
+
 
 /* NEW FORM */
 module.exports.renderNewForm = (req, res) => {
