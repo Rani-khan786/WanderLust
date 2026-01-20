@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const Review = require("./model.js");
 const categories = require("../utils/categories.js");
 
 //  Define Listing Schema

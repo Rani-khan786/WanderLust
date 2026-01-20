@@ -1,56 +1,46 @@
-const User = require("../models/user");
+const User = require("../models/user.js");
 
-
-// Render Signup Form
-module.exports.renderSignupForm = (req,res)=>{
- res.render("users/signup.ejs");
+// GET /signup
+module.exports.renderSignupForm = (req, res) => {
+  res.render("users/signup.ejs");
 };
 
-// POST Signup Form
-module.exports.signup =
-async(req,res)=>{
-    try{
-    let {username,email,password} = req.body;
-    const newUser = new User({email, username});
-    const registerUser = await User.register(newUser, password);
-    console.log(registerUser);
-    req.login(registerUser,(err)=>{
-        if(err){
-            return next(err);
-        }
-         req.flash("success", "Welcome to Wanderlust!");
-         res.redirect("/listings");
+// POST /signup
+module.exports.signup = async (req, res, next) => {
+  try {
+    const { username, email, password } = req.body;
+
+    const newUser = new User({ email, username });
+    const registeredUser = await User.register(newUser, password);
+
+    req.login(registeredUser, (err) => {
+      if (err) return next(err);
+      req.flash("success", "Welcome to WanderDev!");
+      return res.redirect("/listings");
     });
-   
-        } catch(e){
-            req.flash("error",e.message);
-            res.redirect("/signup");
-        }
- };
+  } catch (err) {
+    req.flash("error", err.message);
+    return res.redirect("/signup");
+  }
+};
 
-//  Render Login Form 
-module.exports.renderLoginForm = (req,res)=>{
-    res.render("users/login.ejs");
- };
+// GET /login
+module.exports.renderLoginForm = (req, res) => {
+  res.render("users/login.ejs");
+};
 
+// POST /login
+module.exports.login = async (req, res) => {
+  req.flash("success", "Welcome back!");
+  const redirectUrl = res.locals.redirectUrl || "/listings";
+  return res.redirect(redirectUrl);
+};
 
-
-//  POST Login Form
- module.exports.login = async (req, res) => {
-    req.flash("success", "Welcome back to Wanderlust!");
-
-    const redirectUrl = res.locals.redirectUrl || "/listings";
-    delete req.session.redirectUrl; 
-    res.redirect(redirectUrl);
-  };
-
-//   logout
-module.exports.logout = (req,res,next)=>{
-    req.logout((err) =>{
-        if(err){
-          return  next(err);
-        }
-        req.flash("success","You are logged out now");
-        res.redirect("/listings");
-    });
- }
+// GET /logout
+module.exports.logout = (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    req.flash("success", "Logged out successfully!");
+    return res.redirect("/listings");
+  });
+};

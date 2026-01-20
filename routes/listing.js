@@ -2,28 +2,29 @@ const express = require("express");
 const router = express.Router();
 
 const wrapAsync = require("../utils/wrapAsync.js");
-const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
+const { isLoggedIn, isOwner } = require("../middleware.js");
+
 const listingController = require("../controllers/listings.js");
 
+// multer + cloudinary
 const multer = require("multer");
 const { storage } = require("../cloudConfig.js");
 const upload = multer({ storage });
 
-/* INDEX + CREATE */
+// Index + Create
 router
   .route("/")
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
     upload.single("listing[image]"),
-    validateListing,
     wrapAsync(listingController.createListing)
   );
 
-/* NEW */
-router.get("/new", isLoggedIn, wrapAsync(listingController.renderNewForm));
+// New Form
+router.get("/new", isLoggedIn, listingController.renderNewForm);
 
-/* SHOW + UPDATE + DELETE */
+// Show + Update + Delete
 router
   .route("/:id")
   .get(wrapAsync(listingController.showListing))
@@ -31,17 +32,11 @@ router
     isLoggedIn,
     isOwner,
     upload.single("listing[image]"),
-    validateListing,
     wrapAsync(listingController.updateListing)
   )
   .delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListing));
 
-/* EDIT */
-router.get(
-  "/:id/edit",
-  isLoggedIn,
-  isOwner,
-  wrapAsync(listingController.renderEditForm)
-);
+// Edit Form
+router.get("/:id/edit", isLoggedIn, isOwner, wrapAsync(listingController.renderEditForm));
 
 module.exports = router;

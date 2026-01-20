@@ -6,7 +6,6 @@ module.exports.index = async (req, res) => {
   const { category, search } = req.query;
 
   let filter = {};
-
   if (category) filter.category = category;
 
   if (search && search.trim() !== "") {
@@ -19,16 +18,16 @@ module.exports.index = async (req, res) => {
     req.flash("error", "No listings found!");
   }
 
-  res.render("listings/index.ejs", {
+  return res.render("listings/index.ejs", {
     allListings,
     activeCategory: category || "",
-    search: search || ""
+    search: search || "",
   });
 };
 
 /* NEW FORM */
 module.exports.renderNewForm = (req, res) => {
-  res.render("listings/new.ejs", { categories });
+  return res.render("listings/new.ejs", { categories });
 };
 
 /* SHOW */
@@ -38,7 +37,7 @@ module.exports.showListing = async (req, res) => {
   const listing = await Listing.findById(id)
     .populate({
       path: "reviews",
-      populate: { path: "author" }
+      populate: { path: "author" },
     })
     .populate("owner");
 
@@ -47,7 +46,7 @@ module.exports.showListing = async (req, res) => {
     return res.redirect("/listings");
   }
 
-  res.render("listings/show.ejs", { listing });
+  return res.render("listings/show.ejs", { listing });
 };
 
 /* CREATE */
@@ -62,7 +61,7 @@ module.exports.createListing = async (req, res) => {
 
   newListing.image = {
     url: req.file.path,
-    filename: req.file.filename
+    filename: req.file.filename,
   };
 
   await newListing.save();
@@ -86,10 +85,10 @@ module.exports.renderEditForm = async (req, res) => {
     "/upload/h_300,w_250"
   );
 
-  res.render("listings/edit.ejs", {
+  return res.render("listings/edit.ejs", {
     listing,
     originalImageUrl,
-    categories
+    categories,
   });
 };
 
@@ -99,13 +98,18 @@ module.exports.updateListing = async (req, res) => {
 
   const listing = await Listing.findByIdAndUpdate(id, req.body.listing, {
     new: true,
-    runValidators: true
+    runValidators: true,
   });
+
+  if (!listing) {
+    req.flash("error", "Listing does not exist!");
+    return res.redirect("/listings");
+  }
 
   if (req.file) {
     listing.image = {
       url: req.file.path,
-      filename: req.file.filename
+      filename: req.file.filename,
     };
     await listing.save();
   }
@@ -117,6 +121,7 @@ module.exports.updateListing = async (req, res) => {
 /* DELETE */
 module.exports.destroyListing = async (req, res) => {
   await Listing.findByIdAndDelete(req.params.id);
+
   req.flash("success", "Listing deleted!");
   return res.redirect("/listings");
 };

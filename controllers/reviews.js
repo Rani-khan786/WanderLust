@@ -1,31 +1,27 @@
-const Listing = require("../models/listing");
-const Review = require("../models/model");
+const Listing = require("../models/listing.js");
+const Review = require("../models/review.js");
 
-
-//   create review
 module.exports.createReview = async (req, res) => {
-    let listing = await Listing.findById(req.params.id);
-    let newReview = new Review(req.body.review);
-    newReview.author = req.user._id;
-    console.log(newReview.author);
-    listing.reviews.push(newReview);
+  const listing = await Listing.findById(req.params.id);
 
-    await newReview.save();
-    await listing.save();
+  const newReview = new Review(req.body.review);
+  newReview.author = req.user._id;
 
-    res.redirect(`/listings/${listing._id}`);
-  };
+  listing.reviews.push(newReview);
 
+  await newReview.save();
+  await listing.save();
 
-//   delete review
+  req.flash("success", "New review added!");
+  res.redirect(`/listings/${listing._id}`);
+};
+
 module.exports.destroyReview = async (req, res) => {
-    let { id, reviewId } = req.params;
+  const { id, reviewId } = req.params;
 
-    await Listing.findByIdAndUpdate(id, {
-      $pull: { reviews: reviewId },
-    });
+  await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+  await Review.findByIdAndDelete(reviewId);
 
-    await Review.findByIdAndDelete(reviewId);
-
-    res.redirect(`/listings/${id}`);
-  };
+  req.flash("success", "Review deleted!");
+  res.redirect(`/listings/${id}`);
+};

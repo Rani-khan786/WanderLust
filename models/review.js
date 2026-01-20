@@ -11,7 +11,7 @@ const reviewSchema = new Schema({
     },
     createdAt : {
         type : Date,
-        deafault : Date.now()
+        default : Date.now()
 
     },
     author: {
